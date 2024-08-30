@@ -9,3 +9,6 @@
 ## Autores
 - Diego Leiva
 - Pablo Orellana
+
+## Prueba
+![alt text](<Screenshot from 2024-08-30 08-07-29.png>)
