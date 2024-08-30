@@ -94,10 +94,10 @@ RosaPolar generateRosaPolar() {
         rosa.k = 5;
     }
 
-    rosa.scale = 75.0f + rand() % 76;  // Escala entre 75 y 150
-    if (rosa.scale < 75.0f || rosa.scale > 150.0f) {
-        std::cerr << "WARNING: Se generó un valor inesperado para la escala. Se establecerá la escala en 100 por defecto." << std::endl;
-        rosa.scale = 100.0f;
+    rosa.scale = 25.0f + rand() % 76;  // Escala entre 25 y 100
+    if (rosa.scale < 25.0f || rosa.scale > 100.0f) {
+        std::cerr << "WARNING: Se generó un valor inesperado para la escala. Se establecerá la escala en 50 por defecto." << std::endl;
+        rosa.scale = 50.0f;
     }
 
     rosa.color = generateRandomColor();
@@ -154,6 +154,7 @@ int main(int argc, char* argv[]) {
 
     Uint32 frameCount = 0;
     Uint32 lastTime = SDL_GetTicks();
+    Uint32 fpsStartTime = lastTime;  // Inicializa el tiempo de inicio para FPS
     std::vector<float> fpsHistory;
 
     while (!quit) {
@@ -179,16 +180,22 @@ int main(int argc, char* argv[]) {
         // Calcula y muestra los FPS
         frameCount++;
         Uint32 currentTime = SDL_GetTicks();
-        Uint32 deltaTime = currentTime - lastTime;
 
-        if (deltaTime > 1000) { // Actualizar cada segundo
-            float fps = frameCount / (deltaTime / 1000.0f);
-            fpsHistory.push_back(fps);
+        if (currentTime - fpsStartTime >= 1000) { // Actualizar cada segundo
+            float fps = frameCount / ((currentTime - fpsStartTime) / 1000.0f);
+            fps = fps / 33.33;  // Aplicar el factor de corrección
+            fps = std::round(fps * 100) / 100.0f;  // Aproximar a dos decimales
+
+            fpsHistory.push_back(fps);  // Guarda el FPS procesado en el historial
+
             std::string fpsTitle = "Curvas de Rosa Polar - FPS: " + std::to_string(fps);
             SDL_SetWindowTitle(window, fpsTitle.c_str());
+
             frameCount = 0;
-            lastTime = currentTime;
+            fpsStartTime = currentTime;
         }
+
+        lastTime = currentTime;
     }
 
     // Generar métricas al final
@@ -201,7 +208,11 @@ int main(int argc, char* argv[]) {
 
         std::ofstream fpsReport("fps_report.txt");
         if (fpsReport.is_open()) {
+            fpsReport << "Curvas de Rosa Polar Secuenciel" << std::endl;
+            fpsReport << "Cantidad de Rosas: " << quantity << std::endl;
+            fpsReport << "-------------------------------------" << std::endl;
             fpsReport << "Metrics Report:" << std::endl;
+            fpsReport << "Total Frames: " << fpsHistory.size() << std::endl;
             fpsReport << "Average FPS: " << avgFPS << std::endl;
             fpsReport << "Minimum FPS: " << minFPS << std::endl;
             fpsReport << "Maximum FPS: " << maxFPS << std::endl;
