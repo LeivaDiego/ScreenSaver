@@ -5,18 +5,24 @@
 // Parámetros de la pantalla
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
+const int NUM_POINTS = 125;  // Cantidad de puntos que se moverán a lo largo de la curva
+const float ROTATION_SPEED = 0.0003f;  // Velocidad de rotación de la flor
 
-// Función para dibujar la curva de Rosa Polar
-void drawRosaPolar(SDL_Renderer* renderer, float k, int num_points, SDL_Color color) {
+// Función para dibujar puntos en la curva de Rosa Polar con rotación
+void drawMovingPoints(SDL_Renderer* renderer, float k, float scale, int num_points, float rotation_angle, SDL_Color color) {
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-    
-    for (int i = 0; i < num_points; ++i) {
-        float theta = i * (2.0f * M_PI / num_points);
-        float r = 150 * sin(k * theta); // Escala del radio
-        
-        int x = static_cast<int>(r * cos(theta)) + SCREEN_WIDTH / 2;
-        int y = static_cast<int>(r * sin(theta)) + SCREEN_HEIGHT / 2;
-        
+
+    for (int i = 0; i < NUM_POINTS; ++i) {
+        // Calcula el ángulo theta para cada punto
+        float theta = (i + rotation_angle) * (2.0f * M_PI / num_points);
+        // Calcula el radio r usando la función de Rosa Polar
+        float r = scale * sin(k * theta);
+
+        // Calcula las coordenadas x e y con rotación
+        int x = static_cast<int>(r * cos(theta + rotation_angle)) + SCREEN_WIDTH / 2;
+        int y = static_cast<int>(r * sin(theta + rotation_angle)) + SCREEN_HEIGHT / 2;
+
+        // Dibuja el punto
         SDL_RenderDrawPoint(renderer, x, y);
     }
 }
@@ -42,8 +48,10 @@ int main(int argc, char* args[]) {
 
     bool quit = false;
     SDL_Event e;
-    float k = 5.0f;  // Valor inicial de k
-    int num_points = 1000;
+    float k = 9.0f;  // Valor de k para una flor de 5 pétalos
+    float scale = 150.0f;  // Escala del tamaño de la flor
+    float rotation_angle = 0.0f;  // Ángulo de rotación inicial
+    int num_points = 2 * NUM_POINTS;  // Cantidad total de puntos en la curva
     SDL_Color color = {255, 0, 0, 255}; // Color rojo
 
     while (!quit) {
@@ -57,14 +65,14 @@ int main(int argc, char* args[]) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        // Dibuja la curva de Rosa Polar
-        drawRosaPolar(renderer, k, num_points, color);
+        // Dibuja los puntos en movimiento a lo largo de la curva de Rosa Polar
+        drawMovingPoints(renderer, k, scale, num_points, rotation_angle, color);
 
         // Presenta la escena
         SDL_RenderPresent(renderer);
 
-        // Incrementa k para animación
-        k += 0.01f;
+        // Incrementa el ángulo de rotación para crear el efecto de giro
+        rotation_angle += ROTATION_SPEED;
     }
 
     // Limpia y cierra
@@ -74,3 +82,4 @@ int main(int argc, char* args[]) {
 
     return 0;
 }
+
