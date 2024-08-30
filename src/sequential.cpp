@@ -4,6 +4,9 @@
 #include <vector>
 #include <cstdlib>
 #include <ctime>
+#include <algorithm>
+#include <numeric>
+#include <fstream>
 
 // Parámetros de la pantalla
 const int SCREEN_WIDTH = 640;
@@ -80,13 +83,11 @@ int parseArguments(int argc, char* argv[]) {
 }
 
 // Función para generar una rosa con parámetros aleatorios
-// Función para generar una rosa con parámetros aleatorios
 RosaPolar generateRosaPolar() {
     RosaPolar rosa;
     int petalos_options[] = {3, 5, 7, 9, 11, 13, 15};
     rosa.k = petalos_options[rand() % 7];  // Selecciona aleatoriamente uno de los valores de pétalos
 
-    // Convertimos rosa.k a int antes de aplicar el operador %
     int k_int = static_cast<int>(rosa.k);
     if (k_int < 3 || k_int > 15 || (k_int % 2 == 0 && k_int != 3)) {
         std::cerr << "WARNING: Se generó un valor inesperado para k. Se establecerá k en 5 por defecto." << std::endl;
@@ -113,7 +114,6 @@ RosaPolar generateRosaPolar() {
 
     return rosa;
 }
-
 
 int main(int argc, char* argv[]) {
     srand(time(nullptr)); // Inicialización de la semilla aleatoria
@@ -152,6 +152,10 @@ int main(int argc, char* argv[]) {
     SDL_Event e;
     std::vector<float> rotation_angles(quantity, 0.0f);  // Ángulos de rotación iniciales
 
+    Uint32 frameCount = 0;
+    Uint32 lastTime = SDL_GetTicks();
+    std::vector<float> fpsHistory;
+
     while (!quit) {
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) {
@@ -171,6 +175,42 @@ int main(int argc, char* argv[]) {
 
         // Presenta la escena
         SDL_RenderPresent(renderer);
+
+        // Calcula y muestra los FPS
+        frameCount++;
+        Uint32 currentTime = SDL_GetTicks();
+        Uint32 deltaTime = currentTime - lastTime;
+
+        if (deltaTime > 1000) { // Actualizar cada segundo
+            float fps = frameCount / (deltaTime / 1000.0f);
+            fpsHistory.push_back(fps);
+            std::string fpsTitle = "Curvas de Rosa Polar - FPS: " + std::to_string(fps);
+            SDL_SetWindowTitle(window, fpsTitle.c_str());
+            frameCount = 0;
+            lastTime = currentTime;
+        }
+    }
+
+    // Generar métricas al final
+    if (!fpsHistory.empty()) {
+        float avgFPS = std::accumulate(fpsHistory.begin(), fpsHistory.end(), 0.0f) / fpsHistory.size();
+        float minFPS = *std::min_element(fpsHistory.begin(), fpsHistory.end());
+        float maxFPS = *std::max_element(fpsHistory.begin(), fpsHistory.end());
+        std::sort(fpsHistory.begin(), fpsHistory.end());
+        float fps1PercentLow = fpsHistory[fpsHistory.size() / 100]; // 1% low
+
+        std::ofstream fpsReport("fps_report.txt");
+        if (fpsReport.is_open()) {
+            fpsReport << "Metrics Report:" << std::endl;
+            fpsReport << "Average FPS: " << avgFPS << std::endl;
+            fpsReport << "Minimum FPS: " << minFPS << std::endl;
+            fpsReport << "Maximum FPS: " << maxFPS << std::endl;
+            fpsReport << "1% Low FPS: " << fps1PercentLow << std::endl;
+            fpsReport.close();
+        } else {
+            std::cerr << "ERROR: No se pudo abrir el archivo para guardar el informe de FPS." << std::endl;
+        }
+        std::cout<< "Reporte de métricas guardado en fps_report.txt." << std::endl;
     }
 
     // Limpia y cierra

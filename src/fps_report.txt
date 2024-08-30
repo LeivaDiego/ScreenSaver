@@ -1,0 +1,5 @@
+Metrics Report:
+Average FPS: 1978.16
+Minimum FPS: 1827.17
+Maximum FPS: 2174.83
+1% Low FPS: 1827.17
