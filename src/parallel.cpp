@@ -29,11 +29,11 @@ struct RosaPolar {
 // Mutex para sincronizar el acceso al renderizador
 std::mutex render_mutex;
 
-// Función para calcular los puntos de la curva de Rosa Polar
+// Función para calcular los puntos de la curva de Rosa Polar de manera paralela
 std::vector<std::pair<int, int>> calculatePoints(const RosaPolar& rosa, float rotation_angle) {
-    std::vector<std::pair<int, int>> points;
-    points.reserve(rosa.num_points_total);
+    std::vector<std::pair<int, int>> points(rosa.num_points_total);
 
+    #pragma omp parallel for
     for (int i = 0; i < rosa.num_points_total; ++i) {
         float theta = (i + rotation_angle) * (2.0f * M_PI / rosa.num_points);
         float r = rosa.scale * sin(rosa.k * theta);
@@ -41,7 +41,7 @@ std::vector<std::pair<int, int>> calculatePoints(const RosaPolar& rosa, float ro
         int x = static_cast<int>(r * cos(theta + rotation_angle)) + rosa.x_origin;
         int y = static_cast<int>(r * sin(theta + rotation_angle)) + rosa.y_origin;
 
-        points.emplace_back(x, y);
+        points[i] = std::make_pair(x, y);
     }
 
     return points;
@@ -226,7 +226,7 @@ int main(int argc, char* argv[]) {
         std::sort(fpsHistory.begin(), fpsHistory.end());
         float fps1PercentLow = fpsHistory[fpsHistory.size() / 100]; // 1% low
 
-        std::ofstream fpsReport("par_report.txt");
+        std::ofstream fpsReport("reports/par_report.txt");
         if (fpsReport.is_open()) {
             fpsReport << "Curvas de Rosa Polar Paralelo" << std::endl;
             fpsReport << "Cantidad de Rosas: " << quantity << std::endl;

@@ -206,7 +206,7 @@ int main(int argc, char* argv[]) {
         std::sort(fpsHistory.begin(), fpsHistory.end());
         float fps1PercentLow = fpsHistory[fpsHistory.size() / 100]; // 1% low
 
-        std::ofstream fpsReport("seq_report.txt");
+        std::ofstream fpsReport("reports/seq_report.txt");
         if (fpsReport.is_open()) {
             fpsReport << "Curvas de Rosa Polar Secuencial" << std::endl;
             fpsReport << "Cantidad de Rosas: " << quantity << std::endl;
