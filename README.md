@@ -10,5 +10,5 @@
 - Diego Leiva
 - Pablo Orellana
 
-## Prueba
-![alt text](<Screenshot from 2024-08-30 08-07-29.png>)
+## Curva de Rosa Polar V1
+![alt text](<2024-08-30 08-45-21.gif>)
