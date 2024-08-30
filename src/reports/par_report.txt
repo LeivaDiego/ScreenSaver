@@ -2,7 +2,7 @@ Curvas de Rosa Polar Paralelo
 Cantidad de Rosas: 100
 -------------------------------------
 Metrics Report:
-Average FPS: 12.3741
-Minimum FPS: 8.91
-Maximum FPS: 14.09
-1% Low FPS: 8.91
+Average FPS: 13.275
+Minimum FPS: 10.68
+Maximum FPS: 14.27
+1% Low FPS: 10.68
