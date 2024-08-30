@@ -162,6 +162,7 @@ int main(int argc, char* argv[]) {
 
     // Genera las rosas según la cantidad especificada
     std::vector<RosaPolar> rosas;
+    #pragma omp parallel
     for (int i = 0; i < quantity; ++i) {
         rosas.push_back(generateRosaPolar());
     }
