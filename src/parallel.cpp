@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <numeric>
 #include <fstream>
+#include <omp.h>
+#include <mutex>
 
 // Parámetros de la pantalla
 const int SCREEN_WIDTH = 640;
@@ -24,9 +26,13 @@ struct RosaPolar {
     float rotation_speed;  // Velocidad de rotación
 };
 
-// Función para dibujar puntos en la curva de Rosa Polar con rotación
-void drawMovingPoints(SDL_Renderer* renderer, const RosaPolar& rosa, float rotation_angle) {
-    SDL_SetRenderDrawColor(renderer, rosa.color.r, rosa.color.g, rosa.color.b, rosa.color.a);
+// Mutex para sincronizar el acceso al renderizador
+std::mutex render_mutex;
+
+// Función para calcular los puntos de la curva de Rosa Polar
+std::vector<std::pair<int, int>> calculatePoints(const RosaPolar& rosa, float rotation_angle) {
+    std::vector<std::pair<int, int>> points;
+    points.reserve(rosa.num_points_total);
 
     for (int i = 0; i < rosa.num_points_total; ++i) {
         float theta = (i + rotation_angle) * (2.0f * M_PI / rosa.num_points);
@@ -35,7 +41,19 @@ void drawMovingPoints(SDL_Renderer* renderer, const RosaPolar& rosa, float rotat
         int x = static_cast<int>(r * cos(theta + rotation_angle)) + rosa.x_origin;
         int y = static_cast<int>(r * sin(theta + rotation_angle)) + rosa.y_origin;
 
-        SDL_RenderDrawPoint(renderer, x, y);
+        points.emplace_back(x, y);
+    }
+
+    return points;
+}
+
+// Función para dibujar los puntos calculados en la curva de Rosa Polar
+void drawMovingPoints(SDL_Renderer* renderer, const RosaPolar& rosa, const std::vector<std::pair<int, int>>& points) {
+    std::lock_guard<std::mutex> lock(render_mutex);
+    SDL_SetRenderDrawColor(renderer, rosa.color.r, rosa.color.g, rosa.color.b, rosa.color.a);
+
+    for (const auto& point : points) {
+        SDL_RenderDrawPoint(renderer, point.first, point.second);
     }
 }
 
@@ -169,8 +187,10 @@ int main(int argc, char* argv[]) {
         SDL_RenderClear(renderer);
 
         // Dibuja cada rosa en la pantalla
+        #pragma omp parallel for
         for (int i = 0; i < quantity; ++i) {
-            drawMovingPoints(renderer, rosas[i], rotation_angles[i]);
+            std::vector<std::pair<int, int>> points = calculatePoints(rosas[i], rotation_angles[i]);
+            drawMovingPoints(renderer, rosas[i], points);
             rotation_angles[i] += rosas[i].rotation_speed;  // Actualiza el ángulo de rotación para la rosa
         }
 
@@ -206,9 +226,9 @@ int main(int argc, char* argv[]) {
         std::sort(fpsHistory.begin(), fpsHistory.end());
         float fps1PercentLow = fpsHistory[fpsHistory.size() / 100]; // 1% low
 
-        std::ofstream fpsReport("seq_report.txt");
+        std::ofstream fpsReport("par_report.txt");
         if (fpsReport.is_open()) {
-            fpsReport << "Curvas de Rosa Polar Secuencial" << std::endl;
+            fpsReport << "Curvas de Rosa Polar Paralelo" << std::endl;
             fpsReport << "Cantidad de Rosas: " << quantity << std::endl;
             fpsReport << "-------------------------------------" << std::endl;
             fpsReport << "Metrics Report:" << std::endl;
