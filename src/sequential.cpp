@@ -1,12 +1,12 @@
 #include <SDL2/SDL.h>
 #include <cmath>
 #include <iostream>
-#include <vector>
+#include <list>
 #include <cstdlib>
 #include <ctime>
-#include <algorithm>
-#include <numeric>
 #include <fstream>
+#include <numeric>
+#include <algorithm>
 
 // Parámetros de la pantalla
 const int SCREEN_WIDTH = 640;
@@ -143,19 +143,19 @@ int main(int argc, char* argv[]) {
     }
 
     // Genera las rosas según la cantidad especificada
-    std::vector<RosaPolar> rosas;
+    std::list<RosaPolar> rosas;
     for (int i = 0; i < quantity; ++i) {
         rosas.push_back(generateRosaPolar());
     }
 
     bool quit = false;
     SDL_Event e;
-    std::vector<float> rotation_angles(quantity, 0.0f);  // Ángulos de rotación iniciales
+    std::list<float> rotation_angles(quantity, 0.0f);  // Ángulos de rotación iniciales
 
     Uint32 frameCount = 0;
     Uint32 lastTime = SDL_GetTicks();
     Uint32 fpsStartTime = lastTime;  // Inicializa el tiempo de inicio para FPS
-    std::vector<float> fpsHistory;
+    std::list<float> fpsHistory;
 
     while (!quit) {
         while (SDL_PollEvent(&e) != 0) {
@@ -169,9 +169,11 @@ int main(int argc, char* argv[]) {
         SDL_RenderClear(renderer);
 
         // Dibuja cada rosa en la pantalla
-        for (int i = 0; i < quantity; ++i) {
-            drawMovingPoints(renderer, rosas[i], rotation_angles[i]);
-            rotation_angles[i] += rosas[i].rotation_speed;  // Actualiza el ángulo de rotación para la rosa
+        auto angle_it = rotation_angles.begin();
+        for (auto& rosa : rosas) {
+            drawMovingPoints(renderer, rosa, *angle_it);
+            *angle_it += rosa.rotation_speed;  // Actualiza el ángulo de rotación para la rosa
+            ++angle_it;
         }
 
         // Presenta la escena
@@ -203,8 +205,9 @@ int main(int argc, char* argv[]) {
         float avgFPS = std::accumulate(fpsHistory.begin(), fpsHistory.end(), 0.0f) / fpsHistory.size();
         float minFPS = *std::min_element(fpsHistory.begin(), fpsHistory.end());
         float maxFPS = *std::max_element(fpsHistory.begin(), fpsHistory.end());
-        std::sort(fpsHistory.begin(), fpsHistory.end());
-        float fps1PercentLow = fpsHistory[fpsHistory.size() / 100]; // 1% low
+        fpsHistory.sort();
+        auto fps1PercentLow_it = std::next(fpsHistory.begin(), fpsHistory.size() / 100); // 1% low
+        float fps1PercentLow = *fps1PercentLow_it;
 
         std::ofstream fpsReport("reports/seq_report.txt");
         if (fpsReport.is_open()) {
@@ -220,7 +223,7 @@ int main(int argc, char* argv[]) {
         } else {
             std::cerr << "ERROR: No se pudo abrir el archivo para guardar el informe de FPS." << std::endl;
         }
-        std::cout<< "Reporte de métricas guardado en fps_report.txt." << std::endl;
+        std::cout << "Reporte de métricas guardado en seq_report.txt." << std::endl;
     }
 
     // Limpia y cierra
