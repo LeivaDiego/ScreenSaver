@@ -311,9 +311,7 @@ int main(int argc, char* argv[])
             frameCount = 0;
             fpsStartTime = currentTime;
         }
-        // Ajusta el tiempo de espera para mantener los FPS y
-        // evitar desbordamiento de CPU
-        SDL_Delay(16);
+
         // Actualiza el tiempo
         lastTime = currentTime;
     }
