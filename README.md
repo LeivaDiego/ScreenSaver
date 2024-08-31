@@ -31,7 +31,7 @@ Antes de ejecutar el proyecto, es importante asegurarse de que tu entorno esté 
 ### 1. Clonar el Repositorio
 Comience por clonar el repositorio de GitHub:
 ```bash
-git clone https://github.com/LeivaDiego/XMPP_Chat.git
+https://github.com/LeivaDiego/ScreenSaver.git
 ```
 
 ### 2. Sistema Windows
