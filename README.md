@@ -124,7 +124,7 @@ El proyecto cuenta con 2 archivos con implementaciones paralela y secuencial del
 #### 4.1. Navegar al directorio del proyecto:
 Abra una terminal y navegue al directorio donde se encuentra su proyecto:
 ```bash
-cd cd /ruta/a/su/proyecto
+cd /ruta/a/su/proyecto
 ```
 
 #### 4.2. Compilar el proyecto
