@@ -21,9 +21,8 @@ Este proyecto consiste en el desarrollo de un protector de pantalla (screen save
 
 ---
 ## Ejemplo del Descansa Pantallas
-![alt text](image.png)
+![alt text](Preview.png)
 
-<video controls src="Preview.mp4" title="Title"></video>
 
 
 ## Configuración e Instalación
