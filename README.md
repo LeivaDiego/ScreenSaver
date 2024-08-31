@@ -10,8 +10,6 @@
 - Diego Leiva
 - Pablo Orellana
 
-Aquí tienes un ejemplo detallado de un README para tu proyecto:
-
 ---
 ## Descripción
 Este proyecto consiste en el desarrollo de un protector de pantalla (screen saver) que genera patrones visuales basados en las curvas polares conocidas como Rosa Polar o Curva Rhodoneas. El proyecto incluye dos versiones del algoritmo: una implementación secuencial y otra paralela, utilizando la biblioteca SDL para el renderizado gráfico y OpenMP para la paralelización.

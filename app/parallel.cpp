@@ -11,8 +11,8 @@
 #include <mutex>
 
 // Parámetros de la pantalla
-const int SCREEN_WIDTH = 1280;
-const int SCREEN_HEIGHT = 720;
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 480;
 
 // Estructura para almacenar los parámetros de cada Rosa Polar
 struct RosaPolar {
