@@ -299,7 +299,6 @@ int main(int argc, char* argv[])
         if (currentTime - fpsStartTime >= 1000) 
         {
             float fps = frameCount / ((currentTime - fpsStartTime) / 1000.0f);  // Calcula los FPS
-            fps = fps / 33.33;  // Aplicar el factor de corrección
             fps = std::round(fps * 100) / 100.0f;  // Aproximar a dos decimales
 
             fpsHistory.push_back(fps);  // Guarda el FPS procesado en el historial
@@ -312,7 +311,9 @@ int main(int argc, char* argv[])
             frameCount = 0;
             fpsStartTime = currentTime;
         }
-
+        // Ajusta el tiempo de espera para mantener los FPS y
+        // evitar desbordamiento de CPU
+        SDL_Delay(16);
         // Actualiza el tiempo
         lastTime = currentTime;
     }

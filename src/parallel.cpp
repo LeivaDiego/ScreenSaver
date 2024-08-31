@@ -44,7 +44,6 @@ std::vector<std::pair<int, int>> calculatePoints(const RosaPolar& rosa, float ro
 
     // Calcula los puntos de la curva de Rosa Polar
     #pragma omp parallel for    // Paraleliza el cálculo de los puntos
-
     for (int i = 0; i < rosa.num_points_total; ++i) 
     {   
         // Calcula la posición de cada punto en la curva
@@ -275,7 +274,6 @@ int main(int argc, char* argv[])
 
     // Genera las rosas según la cantidad especificada de forma paralela
     std::vector<RosaPolar> rosas;
-    #pragma omp parallel
     for (int i = 0; i < quantity; ++i) 
     {
         rosas.push_back(generateRosaPolar());
@@ -335,7 +333,6 @@ int main(int argc, char* argv[])
         if (currentTime - fpsStartTime >= 1000) 
         { 
             float fps = frameCount / ((currentTime - fpsStartTime) / 1000.0f); // Calcula los FPS
-            fps = fps / 33.33;  // Aplicar el factor de corrección
             fps = std::round(fps * 100) / 100.0f;  // Aproximar a dos decimales
 
             fpsHistory.push_back(fps);  // Guarda el FPS procesado en el historial

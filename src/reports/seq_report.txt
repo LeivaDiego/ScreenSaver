@@ -1,8 +1,8 @@
 Curvas de Rosa Polar Secuencial
-Cantidad de Rosas: 100
+Cantidad de Rosas: 500
 -------------------------------------
 Metrics Report:
-Average FPS: 23.2658
-Minimum FPS: 18.51
-Maximum FPS: 25.63
-1% Low FPS: 18.51
+Average FPS: 39.1
+Minimum FPS: 38.81
+Maximum FPS: 39.49
+1% Low FPS: 38.81
