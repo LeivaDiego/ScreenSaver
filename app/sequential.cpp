@@ -209,8 +209,17 @@ int main(int argc, char* argv[])
     Uint32 fpsStartTime = lastTime;
     std::list<float> fpsHistory;
 
+    Uint32 startTime = SDL_GetTicks();  // Guardar el tiempo de inicio
+    Uint32 max_duration = 15000;  // 15 segundos en milisegundos
+
     while (!quit) 
     {
+        // Verifica si han pasado 15 segundos
+        if (SDL_GetTicks() - startTime > max_duration) 
+        {
+            quit = true;
+        }
+
         while (SDL_PollEvent(&e) != 0) 
         {
             if (e.type == SDL_QUIT) 
@@ -248,6 +257,7 @@ int main(int argc, char* argv[])
         lastTime = currentTime;
     }
 
+    // Código para generar el informe de FPS (como ya estaba en tu código)
     if (!fpsHistory.empty()) 
     {
         float avgFPS = std::accumulate(fpsHistory.begin(), fpsHistory.end(), 0.0f) / fpsHistory.size();
