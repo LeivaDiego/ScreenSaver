@@ -231,7 +231,7 @@ int main(int argc, char* argv[]) {
 
         std::ofstream fpsReport("reports/par_report.txt");
         if (fpsReport.is_open()) {
-            fpsReport << "Curvas de Rosa Polar Paralelizado con OpenMP" << std::endl;
+            fpsReport << "Curvas de Rosa Polar Paralelizado" << std::endl;
             fpsReport << "Cantidad de Rosas: " << quantity << std::endl;
             fpsReport << "-------------------------------------" << std::endl;
             fpsReport << "Metrics Report:" << std::endl;
