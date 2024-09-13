@@ -47,25 +47,21 @@ std::vector<Point> calculateRosePoints(const RosaPolar& rosa, float rotation_ang
     return points;
 }
 
-// Función para rellenar los pétalos calculados
-std::vector<std::tuple<Point, Point, Point>> calculateFilledPetals(const RosaPolar& rosa, float rotation_angle) {
-    std::vector<std::tuple<Point, Point, Point>> triangles(rosa.num_points);
-
-    #pragma omp parallel for
-    for (int i = 0; i < rosa.num_points; ++i) {
-        float theta = (i + rotation_angle) * (2.0f * M_PI / rosa.num_points);
-        float next_theta = (i + 1 + rotation_angle) * (2.0f * M_PI / rosa.num_points);
-        float r = rosa.scale * sin(rosa.k * theta);
-        float next_r = rosa.scale * sin(rosa.k * next_theta);
-
-        Point p1 = {static_cast<int>(r * cos(theta + rotation_angle)) + rosa.x_origin, static_cast<int>(r * sin(theta + rotation_angle)) + rosa.y_origin};
-        Point p2 = {static_cast<int>(next_r * cos(next_theta + rotation_angle)) + rosa.x_origin, static_cast<int>(next_r * sin(next_theta + rotation_angle)) + rosa.y_origin};
-        Point center = {rosa.x_origin, rosa.y_origin};
-
-        triangles[i] = std::make_tuple(center, p1, p2);
+// Función simplificada para rellenar los pétalos
+void fillPetalsWithLines(SDL_Renderer* renderer, const std::vector<Point>& points, int x_origin, int y_origin) {
+    // Dibujamos líneas que conectan el centro con cada punto de la rosa
+    for (size_t i = 0; i < points.size(); ++i) {
+        SDL_RenderDrawLine(renderer, x_origin, y_origin, points[i].x, points[i].y);
     }
+}
 
-    return triangles;
+// Función para dibujar el contorno de las rosas
+void drawRoseContour(SDL_Renderer* renderer, const std::vector<Point>& points) {
+    for (size_t i = 0; i < points.size() - 1; ++i) {
+        SDL_RenderDrawLine(renderer, points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
+    }
+    // Conecta el último punto con el primero para cerrar el contorno
+    SDL_RenderDrawLine(renderer, points.back().x, points.back().y, points.front().x, points.front().y);
 }
 
 // Función para generar un color aleatorio.
@@ -169,6 +165,10 @@ int main(int argc, char* argv[]) {
             quit = true;
         }
 
+        // Calcula el tiempo de ejecución en segundos
+        Uint32 currentTime = SDL_GetTicks();
+        float elapsedTime = (currentTime - startTime) / 1000.0f;  // Convertir a segundos
+
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) {
                 quit = true;
@@ -178,54 +178,47 @@ int main(int argc, char* argv[]) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        // Almacenar los puntos y triángulos calculados de todas las rosas
+        // Paralelización del cálculo de puntos en cada fotograma
         std::vector<std::vector<Point>> all_rose_points(quantity);
-        std::vector<std::vector<std::tuple<Point, Point, Point>>> all_rose_triangles(quantity);
 
-        // Paralelización del cálculo de puntos y triángulos
         #pragma omp parallel for
         for (int i = 0; i < quantity; ++i) {
             all_rose_points[i] = calculateRosePoints(rosas[i], rotation_angles[i]);
-            all_rose_triangles[i] = calculateFilledPetals(rosas[i], rotation_angles[i]);
-            rotation_angles[i] += rosas[i].rotation_speed;
+            rotation_angles[i] += rosas[i].rotation_speed;  // Rotación continua
         }
 
         // Renderizado en el hilo principal
         for (int i = 0; i < quantity; ++i) {
             SDL_SetRenderDrawColor(renderer, rosas[i].color.r, rosas[i].color.g, rosas[i].color.b, rosas[i].color.a);
 
-            // Dibujar puntos
-            for (const auto& point : all_rose_points[i]) {
-                SDL_RenderDrawPoint(renderer, point.x, point.y);
-            }
-
-            // Dibujar triángulos para rellenar los pétalos
-            for (const auto& triangle : all_rose_triangles[i]) {
-                Point p1 = std::get<0>(triangle);
-                Point p2 = std::get<1>(triangle);
-                Point p3 = std::get<2>(triangle);
-                SDL_RenderDrawLine(renderer, p1.x, p1.y, p2.x, p2.y);
-                SDL_RenderDrawLine(renderer, p2.x, p2.y, p3.x, p3.y);
-                SDL_RenderDrawLine(renderer, p3.x, p3.y, p1.x, p1.y);
-            }
+            // Rellenar pétalos con líneas
+            fillPetalsWithLines(renderer, all_rose_points[i], rosas[i].x_origin, rosas[i].y_origin);
+            
+            // Dibujar el contorno de la rosa
+            drawRoseContour(renderer, all_rose_points[i]);
         }
 
         SDL_RenderPresent(renderer);
 
         frameCount++;
-        Uint32 currentTime = SDL_GetTicks();
+        currentTime = SDL_GetTicks();
         if (currentTime - fpsStartTime >= 1000) {
             float fps = frameCount / ((currentTime - fpsStartTime) / 1000.0f);
             fps = std::round(fps * 100) / 100.0f;
             fpsHistory.push_back(fps);
-            std::string fpsTitle = "Curvas de Rosa Polar - FPS: " + std::to_string(fps);
+
+            // Actualizar el título de la ventana con FPS y tiempo transcurrido
+            std::string fpsTitle = "Curvas de Rosa Polar - FPS: " + std::to_string(fps) +
+                                " - Tiempo: " + std::to_string(elapsedTime) + "s";
             SDL_SetWindowTitle(window, fpsTitle.c_str());
+
             frameCount = 0;
             fpsStartTime = currentTime;
         }
 
         lastTime = currentTime;
     }
+
 
     // Generar informe de FPS (como ya estaba en tu código)
     if (!fpsHistory.empty()) {

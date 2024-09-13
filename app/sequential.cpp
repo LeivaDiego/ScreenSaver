@@ -204,7 +204,7 @@ int main(int argc, char* argv[])
     SDL_Event e;
     std::list<float> rotation_angles(quantity, 0.0f);
 
-    Uint32 frameCount = 0;
+   Uint32 frameCount = 0;
     Uint32 lastTime = SDL_GetTicks();
     Uint32 fpsStartTime = lastTime;
     std::list<float> fpsHistory;
@@ -219,6 +219,10 @@ int main(int argc, char* argv[])
         {
             quit = true;
         }
+
+        // Calcula el tiempo de ejecución en segundos
+        Uint32 currentTime = SDL_GetTicks();
+        float elapsedTime = (currentTime - startTime) / 1000.0f;  // Convertir a segundos
 
         while (SDL_PollEvent(&e) != 0) 
         {
@@ -242,20 +246,25 @@ int main(int argc, char* argv[])
         SDL_RenderPresent(renderer);
 
         frameCount++;
-        Uint32 currentTime = SDL_GetTicks();
+        currentTime = SDL_GetTicks();
         if (currentTime - fpsStartTime >= 1000) 
         {
             float fps = frameCount / ((currentTime - fpsStartTime) / 1000.0f);
             fps = std::round(fps * 100) / 100.0f;
             fpsHistory.push_back(fps);
-            std::string fpsTitle = "Curvas de Rosa Polar - FPS: " + std::to_string(fps);
+
+            // Actualizar el título de la ventana con FPS y tiempo transcurrido
+            std::string fpsTitle = "Curvas de Rosa Polar - FPS: " + std::to_string(fps) +
+                                " - Tiempo: " + std::to_string(elapsedTime) + "s";
             SDL_SetWindowTitle(window, fpsTitle.c_str());
+
             frameCount = 0;
             fpsStartTime = currentTime;
         }
 
         lastTime = currentTime;
     }
+
 
     // Código para generar el informe de FPS (como ya estaba en tu código)
     if (!fpsHistory.empty()) 
