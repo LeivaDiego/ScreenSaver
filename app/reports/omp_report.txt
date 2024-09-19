@@ -1,8 +1,0 @@
-Curvas de Rosa Polar Paralelizado con OpenMP
-Cantidad de Rosas: 100
--------------------------------------
-Metrics Report:
-Average FPS: 4.31333
-Minimum FPS: 3.47
-Maximum FPS: 4.52
-1% Low FPS: 3.47

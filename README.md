@@ -21,9 +21,7 @@ Este proyecto consiste en el desarrollo de un protector de pantalla (screen save
 
 ---
 ## Ejemplo del Descansa Pantallas
-![alt text](Preview.png)
-
-
+![alt text](preview.png)
 
 ## Configuración e Instalación
 Antes de ejecutar el proyecto, es importante asegurarse de que tu entorno esté correctamente configurado. A continuación se detallan los requisitos necesarios según el sistema operativo y el método de ejecución que seleccione (Windows o Linux).
@@ -35,11 +33,10 @@ https://github.com/LeivaDiego/ScreenSaver.git
 ```
 
 ### 2. Sistema Windows
-Si está utilizando Windows y deseas ejecuta este proyecto, a continuación se le presentan los pasos detallados para configurar un entorno virtual en su máquina.
+Si estás utilizando Windows y deseas ejecutar este proyecto, a continuación se presentan los pasos detallados para configurar un entorno en tu máquina utilizando WSL2.
 
 #### 2.1. Prerequisitos
-- `Docker`: (Requerido) Asegures de tener Docker Desktop instalado en su sistema.
-- `WSL2`: Para una experiencia más fluida y sin problemas, se recomienda tener WSL2 instalado en tu equipo.
+- `WSL2`: (Requerido) Para poder utilizar este proyecto desde su equpipo windows, y que su experiencia sea más fluida y sin problemas, es necesario tener WSL2 instalado en tu equipo.
 
     ##### 2.1.1. Instalando WSL2
     Abra PowerShell o el símbolo del sistema de Windows como administrador; para ello, haga clic con el botón derecho y seleccione "**Ejecutar como administrador**", escriba el comando:
@@ -48,50 +45,42 @@ Si está utilizando Windows y deseas ejecuta este proyecto, a continuación se l
     ```
     Una vez completado el proceso reinicie su máquina.
 
-    ##### 2.1.2. Instalando Docker Desktop
-    **Descarga**
-    - Descargue Docker Desktop para Windows desde el sitio oficial de Docker. https://www.docker.com/
-    <br>
-
-    **Instalación**
-    Ejecute el instalador y siga las instrucciones en pantalla.
-    <br>
-
-    **Configurar Docker para WSL2**
-    - Abra Docker Desktop y dirijase a "*Settings*" (*Configuración*).
-    - En la sección "*General*", asegúrese de que la opción "*Use the WSL 2 based engine*" esté seleccionada.
-    - En la sección "*Resources*" -> "*WSL Integration*", seleccione su distribución de Linux (por ejemplo, Ubuntu) para habilitar la integración con WSL2.
-    <br>
+    ##### 2.1.2. Configurando WSL2
+    Una vez instalado, configure su distribución de Linux (por ejemplo, Ubuntu) como predeterminada si no lo está. Puede hacer esto con el comando:
+    ```powershell
+    wsl --set-default <nombre_de_la_distribución>
+    ```
+    Sustituya `<nombre_de_la_distribucion>` por el nombre de la distribución que estés utilizando (como "Ubuntu").
+    </br>
     
     **Verificar la instalación**
-    Abra una terminal de WSL (Ubuntu) y ejecuta:
-    ```bash
-    docker --version
+    Abra la terminal de WSL y ejecute:
+    ```powershell
+    wsl --list --verbose
     ```
-    Debería de ver la versión de Docker instalada.
+    Esto debería mostrar las distribuciones instaladas y su versión (asegúrese de que sea WSL2).
+
+    ##### 2.1.3. Dependencias
+    - `build-essential`: Herramientas de desarrollo esenciales para compilar y construir el proyecto.
+    - `libsdl2-dev`: La biblioteca necesaria para manejar gráficos en la aplicación
+  
+    
 
 
-#### 2.2. Construyendo el contenedor
-Navegue al directorio del proyecto en la terminal de WSL y ejecute:
+#### 2.2. Ejecutar el Proyecto en WSL2
+Navegue al directorio del proyecto en la terminal de WSL navegue hasta el directorio `app` y ejecute los comandos:
+
+##### 2.2.1 Version Secuencial    
 ```bash
-docker build -t <nombre_de_la_imagen> .
+./sequential -q <cantidad_de_rosas>
 ```
-Sustituya `<nombre_de_la_imagen>` con el nombre que desee darle a la imagen Docker.
 
-#### 2.3. Ejecutar el contenedor Docker
-Ejecute el contenedor con el siguiente comando:
+##### 2.2.2 Version Paralela
 ```bash
-docker run -it --rm --name <nombre_del_contenedor> \
--e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix \
--v .:/usr/src <nombre_de_la_imagen> /bin/bash
+./parallel -q <cantidad_de_rosas>
 ```
-- Sustituya `<nombre_de_la_imagen>` con el nombre que desee darle a la imagen Docker.
-- Sustituya `<nombre_del_contenedor>` con el nombre que desee darle a su contenedor Docker.
 
-Esto iniciará el contenedor y permitirá que las aplicaciones gráficas se muestren en su pantalla de Windows.
-
-#### 2.4. Notas Adicionales
-- **Errores en Windows:** Si ejecuta el proyecto en Windows utilizando WSL, es posible que vea errores relacionados con la aceleración gráfica. Estos errores son esperados y no afectarán la ejecución de la aplicación.
+Asegurese de colocar el argumento `-q` (quantity) y sustituya `<cantidad_de_rosas>` con la cantidad de rosas que desee mostrar en el descansa pantallas. 
 
 ### 3. Sistema Linux
 Para usuarios de Linux que prefieren no utilizar contenedores y tienen acceso directo a un sistema Linux, la configuración es bastante sencilla. 
@@ -117,9 +106,8 @@ Para usuarios de Linux que prefieren no utilizar contenedores y tienen acceso di
     sudo apt-get install -y libsdl2-dev
     ```
 
-
 ### 4. Ejecutando el Proyecto
-El proyecto cuenta con 2 archivos con implementaciones paralela y secuencial del misma descansa pantallas. 
+El proyecto cuenta con 2 archivos con implementaciones paralela y secuencial del mismo descansa pantallas. 
 
 #### 4.1. Navegar al directorio del proyecto:
 Abra una terminal y navegue al directorio donde se encuentra su proyecto:
