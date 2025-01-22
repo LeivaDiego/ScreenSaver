@@ -21,7 +21,7 @@ Este proyecto consiste en el desarrollo de un protector de pantalla (screen save
 
 ---
 ## Ejemplo del Descansa Pantallas
-![alt text](preview.png)
+![alt text](Preview.png)
 
 ## Configuración e Instalación
 Antes de ejecutar el proyecto, es importante asegurarse de que tu entorno esté correctamente configurado. A continuación se detallan los requisitos necesarios según el sistema operativo y el método de ejecución que seleccione (Windows o Linux).
